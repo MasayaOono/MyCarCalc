@@ -7,7 +7,6 @@ import {
   Text,
   VStack,
   HStack,
-  Input,
   Slider,
   Button,
   SimpleGrid,
@@ -56,6 +55,7 @@ import {
 } from "@/lib/calculate";
 import { type CarModel } from "@/data/car-models";
 import GoogleAdsense from "@/components/GoogleAdsense";
+import { SmartInput } from "@/components/ui/SmartInput";
 
 // アニメーション定義
 const fadeUpStyle = `
@@ -1124,19 +1124,13 @@ const ModernInput = ({
         {label}
       </Text>
     </HStack>
-    <Input
-      type="number"
+    <SmartInput
       inputMode="decimal"
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
       step={step}
-      variant="flushed"
       fontSize={{ base: "md", md: "lg" }}
-      fontWeight="bold"
-      color="gray.800"
-      border="none"
-      p={0}
-      _focus={{ outline: "none", borderColor: "transparent" }}
+      textAlign="left"
     />
   </Box>
 );

@@ -6,7 +6,6 @@ import {
   VStack,
   Heading,
   Text,
-  Input,
   Button,
   Card,
   Collapsible,
@@ -14,6 +13,7 @@ import {
   createListCollection,
   Icon,
 } from "@chakra-ui/react";
+import { SmartInput } from "@/components/ui/SmartInput";
 import {
   SelectRoot,
   SelectTrigger,
@@ -156,21 +156,9 @@ export default function EntryScreen({ onStart }: Props) {
                     bg: "white",
                   }}
                 >
-                  <Input
-                    type="number"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
+                  <SmartInput
                     value={vehiclePrice}
                     onChange={(e) => setVehiclePrice(Number(e.target.value))}
-                    variant="flushed"
-                    fontSize={{ base: "3xl", md: "4xl" }}
-                    fontWeight="900"
-                    textAlign="center"
-                    border="none"
-                    p={0}
-                    color="gray.800"
-                    _focus={{ outline: "none" }}
-                    placeholder="0"
                   />
                   <Text
                     fontSize="lg"
@@ -204,19 +192,10 @@ export default function EntryScreen({ onStart }: Props) {
                     ringColor: "blue.100",
                   }}
                 >
-                  <Input
-                    type="number"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
+                  <SmartInput
                     value={downPayment}
                     onChange={(e) => setDownPayment(Number(e.target.value))}
-                    variant="flushed"
-                    border="none"
                     fontSize="xl"
-                    fontWeight="bold"
-                    color="gray.800"
-                    placeholder="0"
-                    _focus={{ outline: "none" }}
                   />
                   <Text color="gray.400" fontWeight="bold">
                     万円
@@ -303,19 +282,14 @@ export default function EntryScreen({ onStart }: Props) {
                       px={3}
                       h="48px"
                     >
-                      <Input
-                        type="number"
+                      <SmartInput
                         inputMode="decimal"
                         step={0.1}
                         value={interestRate}
                         onChange={(e) =>
                           setInterestRate(Number(e.target.value))
                         }
-                        variant="flushed"
-                        border="none"
-                        fontWeight="bold"
                         fontSize="lg"
-                        _focus={{ outline: "none" }}
                       />
                       <Text color="gray.400" fontWeight="bold">
                         %
