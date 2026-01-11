@@ -1,244 +1,120 @@
 "use client";
 
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  VStack,
-  SimpleGrid,
-  Card,
-  Separator,
-} from "@chakra-ui/react";
-import {
-  LuPercent,
-  LuCar,
-  LuCalculator,
-  LuPiggyBank,
-  LuShield,
-  LuFuel,
-} from "react-icons/lu";
+import { Box, Heading, Text, VStack, Icon, Accordion } from "@chakra-ui/react";
+import { LuCircleHelp, LuBookOpen } from "react-icons/lu";
 
-// SEO用のコンテンツセクション（フッター付近に配置）
+// FAQ形式のSEOコンテンツセクション（アコーディオン）
 export default function SeoContentSection() {
+  const faqItems = [
+    {
+      value: "item-1",
+      question: "維持費には何が含まれますか？",
+      answer: `車の維持費には、ガソリン代・駐車場代だけでなく、毎年かかる「自動車税」、2年に1回の「車検費用」、加入が推奨される「任意保険料」、そしてオイル交換などの「メンテナンス費用」が含まれます。
+
+多くのローン計算機ではこれらが除外されていますが、当サイトではこれらを合算した「リアルな月額」を算出します。`,
+    },
+    {
+      value: "item-2",
+      question: "頭金はいくら入れればいい？",
+      answer: `一般的には車両価格の10%〜20%が目安と言われています。頭金を入れることで借入額が減り、月々の返済額を抑えることができます。
+
+また、ローンの審査も通りやすくなる傾向があります。無理のない範囲で設定しましょう。`,
+    },
+    {
+      value: "item-3",
+      question: "銀行ローンとディーラーローンの違いは？",
+      answer: `【銀行系ローン】は金利が低い（1〜2%台）のが特徴ですが、審査が比較的厳しく、手続きに時間がかかることがあります。
+
+【ディーラーローン】は車購入と同時に手続きでき審査も早いですが、金利が高め（4〜8%）に設定されていることが多いです。総支払額で数万円〜数十万円の差が出ることもあります。`,
+    },
+    {
+      value: "item-4",
+      question: "年間走行距離の目安は？",
+      answer: `通勤に使う場合は年間8,000〜12,000km、休日のみの使用なら年間3,000〜5,000kmが目安です。
+
+走行距離が多いほどガソリン代やメンテナンス費用が増えるため、購入前に想定しておくことが重要です。`,
+    },
+    {
+      value: "item-5",
+      question: "軽自動車と普通車、維持費はどれくらい違う？",
+      answer: `軽自動車は自動車税が年間10,800円と普通車（25,000円〜）に比べて格安です。また、車検費用や保険料も安くなる傾向があります。
+
+年間の維持費で比較すると、軽自動車は普通車より10〜20万円程度安くなることが多いです。`,
+    },
+  ];
+
   return (
-    <Box bg="gray.100" py={12} mt={8}>
-      <Container maxW="container.md">
-        <VStack gap={10} align="stretch">
-          {/* セクション1: マイカーローンの金利相場 */}
-          <Box>
-            <Heading
-              as="h2"
-              size="md"
-              color="gray.800"
-              mb={4}
-              display="flex"
-              alignItems="center"
-              gap={2}
-            >
-              <LuPercent />
-              マイカーローンの金利相場について
-            </Heading>
-            <Card.Root bg="white" p={5} rounded="xl" shadow="sm">
-              <Text fontSize="sm" color="gray.600" lineHeight="tall">
-                マイカーローンの金利は、銀行系とディーラー系で大きく異なります。
-                <Text as="span" fontWeight="bold" color="gray.800">
-                  銀行系マイカーローン
-                </Text>
-                は年1.5%〜3.5%程度が相場で、審査は厳しめですが金利が低いのが特徴です。
-                一方、
-                <Text as="span" fontWeight="bold" color="gray.800">
-                  ディーラーローン（残価設定含む）
-                </Text>
-                は年3.5%〜8%程度と高めですが、その場で審査が完了するメリットがあります。
-                金利が1%違うだけで、300万円のローンなら総支払額が10万円以上変わることも。
-                当シミュレーターでは、金利を自由に設定して比較検討できます。
-              </Text>
-            </Card.Root>
-          </Box>
-
-          <Separator />
-
-          {/* セクション2: 維持費に含まれる項目 */}
-          <Box>
-            <Heading
-              as="h2"
-              size="md"
-              color="gray.800"
-              mb={4}
-              display="flex"
-              alignItems="center"
-              gap={2}
-            >
-              <LuCalculator />
-              維持費に含まれる項目
-            </Heading>
-            <SimpleGrid columns={[1, 2]} gap={4}>
-              <Card.Root bg="white" p={4} rounded="lg" shadow="sm">
-                <VStack align="start" gap={2}>
-                  <Text fontWeight="bold" color="blue.600" fontSize="sm">
-                    <LuFuel style={{ display: "inline", marginRight: "6px" }} />
-                    ガソリン代
-                  </Text>
-                  <Text fontSize="xs" color="gray.600">
-                    年間走行距離 ÷ 燃費 × ガソリン単価で算出。
-                    地域や走行環境で大きく変動します。
-                  </Text>
-                </VStack>
-              </Card.Root>
-
-              <Card.Root bg="white" p={4} rounded="lg" shadow="sm">
-                <VStack align="start" gap={2}>
-                  <Text fontWeight="bold" color="orange.600" fontSize="sm">
-                    🅿️ 駐車場代
-                  </Text>
-                  <Text fontSize="xs" color="gray.600">
-                    都心部は月2〜5万円、郊外は5千〜1万円が相場。
-                    月極駐車場の有無で維持費が大きく変わります。
-                  </Text>
-                </VStack>
-              </Card.Root>
-
-              <Card.Root bg="white" p={4} rounded="lg" shadow="sm">
-                <VStack align="start" gap={2}>
-                  <Text fontWeight="bold" color="green.600" fontSize="sm">
-                    <LuShield
-                      style={{ display: "inline", marginRight: "6px" }}
-                    />
-                    任意保険
-                  </Text>
-                  <Text fontSize="xs" color="gray.600">
-                    年齢・等級・車両保険の有無で変動。
-                    20代は月1万円超、30代以降は5千円〜が目安。
-                  </Text>
-                </VStack>
-              </Card.Root>
-
-              <Card.Root bg="white" p={4} rounded="lg" shadow="sm">
-                <VStack align="start" gap={2}>
-                  <Text fontWeight="bold" color="pink.600" fontSize="sm">
-                    📋 自動車税・車検
-                  </Text>
-                  <Text fontSize="xs" color="gray.600">
-                    自動車税は排気量で決定（軽は10,800円/年）。
-                    車検は2年ごとに6〜15万円程度。
-                  </Text>
-                </VStack>
-              </Card.Root>
-            </SimpleGrid>
-          </Box>
-
-          <Separator />
-
-          {/* セクション3: 年収別の車選びの目安 */}
-          <Box>
-            <Heading
-              as="h2"
-              size="md"
-              color="gray.800"
-              mb={4}
-              display="flex"
-              alignItems="center"
-              gap={2}
-            >
-              <LuPiggyBank />
-              年収別の車選びの目安
-            </Heading>
-            <Card.Root bg="white" p={5} rounded="xl" shadow="sm">
-              <Text fontSize="sm" color="gray.600" lineHeight="tall" mb={4}>
-                一般的に、
-                <Text as="span" fontWeight="bold" color="gray.800">
-                  「車両価格は年収の半分まで」
-                </Text>
-                が無理のない目安とされています。ただし、これはローンや維持費を考慮していない単純な目安です。
-              </Text>
-              <SimpleGrid columns={[1, 3]} gap={3}>
-                <Box bg="blue.50" p={3} rounded="lg" textAlign="center">
-                  <Text fontSize="xs" color="gray.500">
-                    年収300万円
-                  </Text>
-                  <Text fontWeight="bold" color="blue.600">
-                    〜150万円
-                  </Text>
-                  <Text fontSize="2xs" color="gray.500">
-                    軽自動車・中古車
-                  </Text>
-                </Box>
-                <Box bg="blue.50" p={3} rounded="lg" textAlign="center">
-                  <Text fontSize="xs" color="gray.500">
-                    年収500万円
-                  </Text>
-                  <Text fontWeight="bold" color="blue.600">
-                    〜250万円
-                  </Text>
-                  <Text fontSize="2xs" color="gray.500">
-                    コンパクトカー
-                  </Text>
-                </Box>
-                <Box bg="blue.50" p={3} rounded="lg" textAlign="center">
-                  <Text fontSize="xs" color="gray.500">
-                    年収700万円
-                  </Text>
-                  <Text fontWeight="bold" color="blue.600">
-                    〜350万円
-                  </Text>
-                  <Text fontSize="2xs" color="gray.500">
-                    SUV・ミニバン
-                  </Text>
-                </Box>
-              </SimpleGrid>
-              <Text fontSize="xs" color="gray.500" mt={4}>
-                ※
-                維持費を含めた月々の支出が手取りの15%以内に収まるのが理想的です。
-                当シミュレーターで維持費込みの総額を確認しましょう。
-              </Text>
-            </Card.Root>
-          </Box>
-
-          <Separator />
-
-          {/* セクション4: このシミュレーターの特徴 */}
-          <Box>
-            <Heading
-              as="h2"
-              size="md"
-              color="gray.800"
-              mb={4}
-              display="flex"
-              alignItems="center"
-              gap={2}
-            >
-              <LuCar />
-              MY CAR CALCの特徴
-            </Heading>
-            <Card.Root bg="white" p={5} rounded="xl" shadow="sm">
-              <VStack align="start" gap={3}>
-                <Text fontSize="sm" color="gray.600" lineHeight="tall">
-                  銀行やディーラーの公式サイトにある計算機は、
-                  <Text as="span" fontWeight="bold" color="red.500">
-                    ローン返済額のみ
-                  </Text>
-                  を表示するものがほとんど。しかし実際の出費は、それだけではありません。
-                </Text>
-                <Text fontSize="sm" color="gray.600" lineHeight="tall">
-                  MY CAR CALCは、ローン返済額に加えて
-                  <Text as="span" fontWeight="bold" color="blue.600">
-                    「ガソリン代」「駐車場代」「任意保険」「自動車税」「車検代」「メンテナンス費用」
-                  </Text>
-                  まで含めた
-                  <Text as="span" fontWeight="bold" color="gray.800">
-                    「月々の本当の出費」
-                  </Text>
-                  を計算できる唯一のシミュレーターです。
-                </Text>
-                <Text fontSize="sm" color="gray.600" lineHeight="tall">
-                  車を買う前に、維持できるかどうかを確認しましょう。
-                </Text>
-              </VStack>
-            </Card.Root>
-          </Box>
+    <Box as="section" py={8}>
+      <VStack gap={6} align="stretch">
+        {/* セクション見出し */}
+        <VStack align="center" gap={2} mb={2}>
+          <Icon color="blue.500" fontSize="2xl">
+            <LuBookOpen />
+          </Icon>
+          <Heading size="md" color="gray.700" textAlign="center">
+            マイカーローンの基礎知識
+          </Heading>
+          <Text fontSize="xs" color="gray.500">
+            知っておきたいお金の話
+          </Text>
         </VStack>
-      </Container>
+
+        {/* アコーディオン (FAQスタイル) */}
+        <Accordion.Root collapsible variant="plain">
+          {faqItems.map((item) => (
+            <Accordion.Item
+              key={item.value}
+              value={item.value}
+              borderBottom="1px solid"
+              borderColor="gray.200"
+            >
+              <Accordion.ItemTrigger
+                py={4}
+                px={2}
+                cursor="pointer"
+                _hover={{ bg: "gray.50" }}
+              >
+                <Text
+                  fontWeight="bold"
+                  color="gray.700"
+                  fontSize="sm"
+                  flex={1}
+                  textAlign="left"
+                >
+                  Q. {item.question}
+                </Text>
+                <Accordion.ItemIndicator />
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent pb={4} px={2}>
+                <Text
+                  fontSize="sm"
+                  color="gray.600"
+                  lineHeight="tall"
+                  whiteSpace="pre-line"
+                >
+                  {item.answer}
+                </Text>
+              </Accordion.ItemContent>
+            </Accordion.Item>
+          ))}
+        </Accordion.Root>
+
+        {/* 補足 */}
+        <Box
+          bg="blue.50"
+          p={4}
+          rounded="lg"
+          border="1px solid"
+          borderColor="blue.100"
+        >
+          <Text fontSize="xs" color="blue.800" lineHeight="relaxed">
+            <Icon display="inline" mr={1}>
+              <LuCircleHelp />
+            </Icon>
+            このシミュレーターは、ボーナス払いや残価設定型ローンの詳細な金利変動には対応していません。あくまで目安としてご利用ください。
+          </Text>
+        </Box>
+      </VStack>
     </Box>
   );
 }

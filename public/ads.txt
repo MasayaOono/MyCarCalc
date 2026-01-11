@@ -1,0 +1,4 @@
+# Google AdSense
+# YOUR_PUBLISHER_ID を実際のAdSenseパブリッシャーIDに置き換えてください
+# 例: pub-1234567890123456
+google.com, YOUR_PUBLISHER_ID, DIRECT, f08c47fec0942fa0

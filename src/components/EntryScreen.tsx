@@ -8,11 +8,11 @@ import {
   Text,
   Input,
   Button,
-  SimpleGrid,
   Card,
   Collapsible,
   HStack,
   createListCollection,
+  Icon,
 } from "@chakra-ui/react";
 import {
   SelectRoot,
@@ -28,10 +28,13 @@ import {
   LuChevronUp,
   LuPercent,
   LuCalculator,
+  LuMapPin,
+  LuWallet,
 } from "react-icons/lu";
 import { REGION_OPTIONS, type RegionKey } from "@/data/regions";
 import { type EntryInput, DEFAULT_ENTRY_INPUT } from "@/lib/calculate";
 import SeoContentSection from "./SeoContentSection";
+import CalculationLoader from "./CalculationLoader";
 
 type Props = {
   onStart: (data: EntryInput) => void;
@@ -49,172 +52,217 @@ export default function EntryScreen({ onStart }: Props) {
     DEFAULT_ENTRY_INPUT.interestRate
   );
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   const regionCollection = createListCollection({
     items: REGION_OPTIONS,
   });
 
   const handleStart = () => {
-    onStart({
-      vehiclePrice,
-      downPayment,
-      region,
-      interestRate,
-    });
+    // 1. ローダーを表示
+    setIsCalculating(true);
+
+    // 2. あえて2.5秒待つ (Labor Illusionの演出)
+    setTimeout(() => {
+      // 3. データ受け渡し & 画面遷移を実行
+      onStart({
+        vehiclePrice,
+        downPayment,
+        region,
+        interestRate,
+      });
+    }, 2500);
   };
 
   return (
-    <Box
-      minH="100vh"
-      bg="gray.50"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <Container maxW="container.sm" py={12}>
-        <VStack gap={6} align="stretch">
-          {/* ヘッダー：親しみやすいアイコンと日本語タイトル */}
-          <VStack textAlign="center" mb={2}>
+    <Box minH="100vh" bg="gray.50" pt={{ base: 8, md: 12 }} pb={20}>
+      {/* 計算中ローダー */}
+      {isCalculating && <CalculationLoader />}
+
+      <Container maxW="container.sm" px={{ base: 4, md: 6 }}>
+        <VStack gap={8} align="stretch">
+          {/* ヘッダー */}
+          <VStack textAlign="center" gap={4}>
             <Box
-              p={3}
-              bg="blue.100"
+              p={4}
+              bg="blue.50"
               color="blue.600"
-              rounded="full"
-              fontSize="2xl"
+              rounded="2xl"
+              fontSize="3xl"
+              shadow="sm"
             >
               <LuCalculator />
             </Box>
-            <Heading size="xl" color="gray.800" fontWeight="800">
-              マイカーローン計算
-            </Heading>
-            <Text color="gray.500" fontSize="sm" lineHeight="tall">
-              維持費・税金・保険料まで含めた
-              <br />
-              <Text as="span" color="blue.600" fontWeight="bold">
-                「リアルな月々の出費」
+            <VStack gap={1}>
+              <Heading
+                size="xl"
+                color="gray.800"
+                fontWeight="900"
+                letterSpacing="tight"
+              >
+                マイカーローン計算
+              </Heading>
+              <Text
+                color="gray.500"
+                fontSize="sm"
+                fontWeight="medium"
+                lineHeight="tall"
+                textAlign="center"
+              >
+                維持費・税金・保険料まで含めた
+                <br />
+                <Text as="span" color="blue.600" fontWeight="bold">
+                  「リアルな月々の出費」
+                </Text>
+                をチェックしましょう
               </Text>
-              をチェックしましょう
-            </Text>
+            </VStack>
           </VStack>
 
-          {/* 入力カード：白背景にしっかりした影 */}
+          {/* 入力フォームカード */}
           <Card.Root
             bg="white"
-            shadow="lg"
+            shadow="xl"
             rounded="2xl"
             border="none"
             overflow="hidden"
           >
-            {/* 上部にアクセントカラーのライン */}
+            {/* 装飾ライン */}
             <Box
               h="6px"
               bgGradient="to-r"
-              gradientFrom="blue.400"
-              gradientTo="teal.400"
+              gradientFrom="blue.500"
+              gradientTo="cyan.400"
             />
 
             <Card.Body gap={8} p={{ base: 6, md: 8 }}>
-              {/* 1. 車両価格 (一番目立たせる) */}
+              {/* 1. 車両価格 (メイン) */}
               <Box>
-                <Text fontSize="sm" fontWeight="bold" color="gray.700" mb={2}>
+                <Text fontSize="sm" fontWeight="bold" color="gray.700" mb={3}>
                   車両価格（税込）
                 </Text>
-                <HStack>
+                <HStack
+                  bg="gray.50"
+                  rounded="xl"
+                  border="1px solid"
+                  borderColor="gray.200"
+                  px={4}
+                  py={2}
+                  transition="all 0.2s"
+                  _focusWithin={{
+                    ring: "2px",
+                    ringColor: "blue.100",
+                    borderColor: "blue.400",
+                    bg: "white",
+                  }}
+                >
                   <Input
                     type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={vehiclePrice}
                     onChange={(e) => setVehiclePrice(Number(e.target.value))}
-                    size="xl"
-                    fontSize="3xl"
-                    fontWeight="bold"
+                    variant="flushed"
+                    fontSize={{ base: "3xl", md: "4xl" }}
+                    fontWeight="900"
                     textAlign="center"
-                    bg="gray.50"
-                    border="1px solid"
-                    borderColor="gray.200"
-                    _focus={{
-                      bg: "white",
-                      borderColor: "blue.400",
-                      ring: "2px",
-                      ringColor: "blue.100",
-                    }}
-                    rounded="xl"
-                    py={6}
+                    border="none"
+                    p={0}
                     color="gray.800"
+                    _focus={{ outline: "none" }}
+                    placeholder="0"
                   />
-                  <Text fontSize="lg" fontWeight="bold" color="gray.500">
+                  <Text
+                    fontSize="lg"
+                    fontWeight="bold"
+                    color="gray.400"
+                    whiteSpace="nowrap"
+                  >
                     万円
                   </Text>
                 </HStack>
               </Box>
 
-              {/* 2. 頭金 & 地域 (2カラム) */}
-              <SimpleGrid columns={[1, 2]} gap={4}>
-                <Box>
-                  <Text fontSize="sm" fontWeight="bold" color="gray.700" mb={2}>
+              {/* 2. 頭金 (縦積み) */}
+              <Box>
+                <HStack mb={2} color="gray.500">
+                  <LuWallet />
+                  <Text fontSize="sm" fontWeight="bold" color="gray.700">
                     頭金
                   </Text>
-                  <HStack>
-                    <Input
-                      type="number"
-                      value={downPayment}
-                      onChange={(e) => setDownPayment(Number(e.target.value))}
-                      size="lg"
-                      bg="gray.50"
-                      border="1px solid"
-                      borderColor="gray.200"
-                      _focus={{
-                        bg: "white",
-                        borderColor: "blue.400",
-                        ring: "2px",
-                        ringColor: "blue.100",
-                      }}
-                      rounded="lg"
-                      fontWeight="bold"
-                      color="gray.800"
-                    />
-                    <Text fontWeight="bold" color="gray.500">
-                      万円
-                    </Text>
-                  </HStack>
-                </Box>
-                <Box>
-                  <Text fontSize="sm" fontWeight="bold" color="gray.700" mb={2}>
+                </HStack>
+                <HStack
+                  bg="white"
+                  rounded="lg"
+                  border="1px solid"
+                  borderColor="gray.200"
+                  px={4}
+                  h="56px"
+                  _focusWithin={{
+                    borderColor: "blue.400",
+                    ring: "2px",
+                    ringColor: "blue.100",
+                  }}
+                >
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={downPayment}
+                    onChange={(e) => setDownPayment(Number(e.target.value))}
+                    variant="flushed"
+                    border="none"
+                    fontSize="xl"
+                    fontWeight="bold"
+                    color="gray.800"
+                    placeholder="0"
+                    _focus={{ outline: "none" }}
+                  />
+                  <Text color="gray.400" fontWeight="bold">
+                    万円
+                  </Text>
+                </HStack>
+              </Box>
+
+              {/* 3. 地域 (縦積み) */}
+              <Box>
+                <HStack mb={2} color="gray.500">
+                  <LuMapPin />
+                  <Text fontSize="sm" fontWeight="bold" color="gray.700">
                     お住まいの地域
                   </Text>
-                  <SelectRoot
-                    collection={regionCollection}
-                    value={[region]}
-                    onValueChange={(e) => setRegion(e.value[0] as RegionKey)}
-                    size="lg"
+                </HStack>
+                <SelectRoot
+                  collection={regionCollection}
+                  value={[region]}
+                  onValueChange={(e) => setRegion(e.value[0] as RegionKey)}
+                  size="lg"
+                >
+                  <SelectTrigger
+                    h="56px"
+                    bg="white"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    rounded="lg"
+                    px={4}
+                    _hover={{ borderColor: "gray.300" }}
                   >
-                    <SelectTrigger
-                      bg="gray.50"
-                      border="1px solid"
-                      borderColor="gray.200"
-                      rounded="lg"
-                      _hover={{ borderColor: "gray.300" }}
-                      color="gray.800"
-                    >
-                      <SelectValueText placeholder="選択してください" />
-                    </SelectTrigger>
-                    <SelectContent bg="white" borderColor="gray.200">
-                      {REGION_OPTIONS.map((option) => (
-                        <SelectItem
-                          key={option.value}
-                          item={option}
-                          bg="white"
-                          _hover={{ bg: "gray.50" }}
-                          color="gray.800"
-                        >
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectRoot>
-                </Box>
-              </SimpleGrid>
+                    <SelectValueText placeholder="選択してください" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REGION_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} item={option}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </SelectRoot>
+                <Text fontSize="xs" color="gray.400" mt={1.5} ml={1}>
+                  ※ 地域のガソリン代・駐車場代の目安を自動設定します
+                </Text>
+              </Box>
 
-              {/* 詳細設定（金利など） */}
+              {/* 詳細設定 (金利) */}
               <Collapsible.Root
                 open={showAdvanced}
                 onOpenChange={(d) => setShowAdvanced(d.open)}
@@ -223,54 +271,57 @@ export default function EntryScreen({ onStart }: Props) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    color="gray.500"
                     w="full"
-                    justifyContent="center"
-                    _hover={{ color: "gray.700", bg: "gray.100" }}
+                    color="gray.500"
+                    fontWeight="normal"
+                    _hover={{ bg: "gray.50", color: "gray.800" }}
                   >
-                    {showAdvanced ? "詳細を閉じる" : "金利を変更する"}
+                    {showAdvanced ? "詳細設定を閉じる" : "金利を調整する"}
                     {showAdvanced ? <LuChevronUp /> : <LuChevronDown />}
                   </Button>
                 </Collapsible.Trigger>
                 <Collapsible.Content>
                   <Box
-                    mt={3}
+                    mt={4}
                     p={4}
                     bg="gray.50"
-                    rounded="lg"
-                    border="1px solid"
-                    borderColor="gray.200"
+                    rounded="xl"
+                    border="1px dashed"
+                    borderColor="gray.300"
                   >
                     <HStack gap={2} mb={2}>
-                      <LuPercent color="var(--chakra-colors-gray-500)" />
+                      <LuPercent color="var(--chakra-colors-gray-400)" />
                       <Text fontSize="sm" color="gray.600" fontWeight="bold">
                         金利（実質年率）
                       </Text>
                     </HStack>
-                    <HStack>
+                    <HStack
+                      bg="white"
+                      rounded="lg"
+                      border="1px solid"
+                      borderColor="gray.200"
+                      px={3}
+                      h="48px"
+                    >
                       <Input
                         type="number"
+                        inputMode="decimal"
                         step={0.1}
                         value={interestRate}
                         onChange={(e) =>
                           setInterestRate(Number(e.target.value))
                         }
-                        bg="white"
-                        border="1px solid"
-                        borderColor="gray.200"
+                        variant="flushed"
+                        border="none"
                         fontWeight="bold"
-                        color="gray.800"
-                        _focus={{
-                          borderColor: "blue.400",
-                          ring: "2px",
-                          ringColor: "blue.100",
-                        }}
+                        fontSize="lg"
+                        _focus={{ outline: "none" }}
                       />
-                      <Text fontWeight="bold" color="gray.500">
+                      <Text color="gray.400" fontWeight="bold">
                         %
                       </Text>
                     </HStack>
-                    <Text fontSize="xs" color="gray.500" mt={2}>
+                    <Text fontSize="xs" color="gray.400" mt={2}>
                       ※ 銀行系: 1〜2% / ディーラー: 4〜8% が目安
                     </Text>
                   </Box>
@@ -281,57 +332,57 @@ export default function EntryScreen({ onStart }: Props) {
               <Button
                 size="xl"
                 w="full"
-                mt={2}
-                py={7}
-                fontSize="md"
+                h="64px"
+                fontSize="lg"
                 fontWeight="bold"
                 onClick={handleStart}
                 bgGradient="to-r"
-                gradientFrom="blue.500"
-                gradientTo="teal.400"
+                gradientFrom="blue.600"
+                gradientTo="blue.400"
                 color="white"
                 rounded="xl"
+                shadow="lg"
                 _hover={{
-                  opacity: 0.9,
-                  transform: "translateY(-1px)",
-                  shadow: "md",
+                  transform: "translateY(-2px)",
+                  shadow: "xl",
+                  opacity: 0.95,
+                }}
+                _active={{
+                  transform: "scale(0.98)",
                 }}
                 transition="all 0.2s"
               >
-                計算結果を見る
-                <LuArrowRight />
+                シミュレーション開始
+                <Icon ml={2}>
+                  <LuArrowRight />
+                </Icon>
               </Button>
             </Card.Body>
           </Card.Root>
 
-          {/* 広告エリア：背景に馴染ませる */}
-          <Box textAlign="center">
-            <Text fontSize="xs" color="gray.400" mb={1}>
-              スポンサーリンク
+          {/* 広告エリア */}
+          <Box textAlign="center" py={4}>
+            <Text fontSize="xs" color="gray.300" mb={2}>
+              SPONSORED
             </Text>
             <Box
               h="100px"
-              bg="gray.200"
+              bg="gray.100"
               rounded="lg"
               display="flex"
               alignItems="center"
               justifyContent="center"
-              color="gray.500"
+              color="gray.400"
               fontSize="sm"
             >
               [ 広告エリア ]
             </Box>
           </Box>
 
-          {/* フッター */}
-          <Text textAlign="center" fontSize="xs" color="gray.500">
-            ※ 計算結果はあくまで目安です。実際の費用は条件により異なります。
-          </Text>
+          {/* SEOコンテンツ（アコーディオン化） */}
+          <SeoContentSection />
         </VStack>
       </Container>
-
-      {/* SEOコンテンツセクション */}
-      <SeoContentSection />
     </Box>
   );
 }
