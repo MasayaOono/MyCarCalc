@@ -105,7 +105,7 @@ export default function RootLayout({
       <head>
         <meta
           name="google-site-verification"
-          content="EXS3f0Y2sGdlQzUdfQOk-1PMUrR8Vro0hOpMg53aOiw"
+          content="18DudpEq8dFrhiFgElYMA04_Tj-oS0KLNFOFgLzRKaY"
         />
         <script
           type="application/ld+json"
