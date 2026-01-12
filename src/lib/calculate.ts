@@ -48,28 +48,52 @@ export type CalcResult = {
 
 export const calculateTotalMonthlyCost = (input: CalcInput): CalcResult => {
   // --- 1. ローン計算 (元利均等) ---
-  const principal = Math.max(
+  const totalPrincipal = Math.max(
     0,
     (input.vehiclePrice - input.downPayment) * 10000
   ); // 借入元本(円)
   const monthlyRate = input.interestRate / 100 / 12;
   const numPayments = input.loanYears * 12;
+  const bonusPayments = input.loanYears * 2; // ボーナス回数（年2回）
 
-  let monthlyLoanPayment = 0;
-  if (principal > 0) {
-    if (monthlyRate === 0) {
-      // 金利0%の場合
-      monthlyLoanPayment = principal / numPayments;
-    } else {
-      // PMT公式
-      monthlyLoanPayment =
-        (principal * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
-        (Math.pow(1 + monthlyRate, numPayments) - 1);
-    }
-  }
+  // ボーナス払い総額（1回あたり × 回数）
+  // ただし借入総額を超えないようにする
+  const requestedBonusTotal = input.bonusPayment * 10000 * bonusPayments;
+  const bonusPrincipal = Math.min(requestedBonusTotal, totalPrincipal * 0.5); // 最大50%まで
+  const regularPrincipal = totalPrincipal - bonusPrincipal;
 
-  // ボーナス払いを月割り平均化（年2回想定）
-  const bonusMonthlyAverage = (input.bonusPayment * 10000 * 2) / 12;
+  // PMT計算関数
+  const calcPMT = (
+    principal: number,
+    rate: number,
+    periods: number
+  ): number => {
+    if (principal <= 0 || periods <= 0) return 0;
+    if (rate === 0) return principal / periods;
+    return (
+      (principal * rate * Math.pow(1 + rate, periods)) /
+      (Math.pow(1 + rate, periods) - 1)
+    );
+  };
+
+  // 通常の月々返済（毎月返済分の元本に対して）
+  const monthlyLoanPayment = calcPMT(
+    regularPrincipal,
+    monthlyRate,
+    numPayments
+  );
+
+  // ボーナス払い（ボーナス返済分の元本に対して、半年ごとの返済）
+  // 半年利 = (1 + 月利)^6 - 1（複利計算）
+  const semiAnnualRate = monthlyRate > 0 ? Math.pow(1 + monthlyRate, 6) - 1 : 0;
+  const bonusPaymentAmount = calcPMT(
+    bonusPrincipal,
+    semiAnnualRate,
+    bonusPayments
+  );
+
+  // ボーナス払いを月割り平均化（年2回 ÷ 12ヶ月）
+  const bonusMonthlyAverage = (bonusPaymentAmount * 2) / 12;
 
   // --- 2. ガソリン代計算 ---
   // 年間走行距離 ÷ 燃費 × ガソリン単価 ÷ 12ヶ月
