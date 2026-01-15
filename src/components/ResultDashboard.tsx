@@ -91,30 +91,203 @@ type Props = {
   carOverrides?: CarOverrides; // 車種固有の初期値
 };
 
-// 広告コンポーネント（レクタングル大）
-const AdSlotLarge = () => (
-  <Box py={2}>
-    <Text fontSize="xs" color="gray.400" textAlign="center" mb={1}>
-      スポンサーリンク
-    </Text>
+// 広告コンポーネント（レクタングル大）- 一時的に非表示
+// const AdSlotLarge = () => (
+//   <Box py={2}>
+//     <Text fontSize="xs" color="gray.400" textAlign="center" mb={1}>
+//       スポンサーリンク
+//     </Text>
+//     <Box
+//       minH="250px"
+//       maxW="100%"
+//       bg="gray.100"
+//       rounded="xl"
+//       overflow="hidden"
+//       display="flex"
+//       alignItems="center"
+//       justifyContent="center"
+//     >
+//       <GoogleAdsense
+//         slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_RECTANGLE || "0000000000"}
+//         format="rectangle"
+//         style={{ width: "100%", maxWidth: "300px", height: "250px" }}
+//       />
+//     </Box>
+//   </Box>
+// );
+
+// ✨ 汎用広告カード（正方形画像対応）
+const AdCard = ({
+  title,
+  description,
+  ctaText,
+  imageUrl,
+  affiliateUrl,
+  badges,
+  trackingPixel,
+}: {
+  title: string;
+  description: string;
+  ctaText: string;
+  imageUrl?: string;
+  affiliateUrl: string;
+  badges?: string[];
+  trackingPixel?: string;
+}) => {
+  // スポンサー募集中（URLが空）の場合
+  const isSponsorSlot = !affiliateUrl;
+
+  const cardContent = (
     <Box
-      minH="250px"
-      maxW="100%"
-      bg="gray.100"
+      bg={isSponsorSlot ? "gray.50" : "white"}
+      border="1px solid"
+      borderColor={isSponsorSlot ? "gray.300" : "gray.200"}
+      borderStyle={isSponsorSlot ? "dashed" : "solid"}
       rounded="xl"
-      overflow="hidden"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
+      p={3}
+      cursor={isSponsorSlot ? "default" : "pointer"}
+      transition="all 0.2s"
+      _hover={
+        isSponsorSlot
+          ? {}
+          : {
+              borderColor: "blue.400",
+              shadow: "md",
+              transform: "translateY(-1px)",
+            }
+      }
     >
-      <GoogleAdsense
-        slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_RECTANGLE || "0000000000"}
-        format="rectangle"
-        style={{ width: "100%", maxWidth: "300px", height: "250px" }}
-      />
+      {/* PRバッジ（スポンサー募集中の場合は非表示） */}
+      {!isSponsorSlot && (
+        <Box position="absolute" top={3} right={3}>
+          <Text fontSize="2xs" color="gray.300" fontWeight="bold">
+            PR
+          </Text>
+        </Box>
+      )}
+
+      <HStack align="start" gap={3}>
+        {/* 正方形画像エリア */}
+        <Box
+          boxSize="80px"
+          flexShrink={0}
+          bg={isSponsorSlot ? "gray.100" : "gray.50"}
+          rounded="lg"
+          overflow="hidden"
+          border="1px solid"
+          borderColor="gray.100"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          {imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt={title}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <VStack gap={0}>
+              <Text fontSize="2xl">{isSponsorSlot ? "📢" : "🎁"}</Text>
+              <Text fontSize="2xs" fontWeight="bold" color="gray.400">
+                {isSponsorSlot ? "AD" : "CHECK"}
+              </Text>
+            </VStack>
+          )}
+        </Box>
+
+        {/* テキストエリア */}
+        <VStack align="start" gap={1} flex={1} minW={0}>
+          {badges && badges.length > 0 && (
+            <HStack gap={1} flexWrap="wrap">
+              {badges.map((badge) => (
+                <Badge
+                  key={badge}
+                  size="sm"
+                  bg={isSponsorSlot ? "gray.100" : "blue.50"}
+                  color={isSponsorSlot ? "gray.500" : "blue.600"}
+                  fontSize="2xs"
+                  px={1.5}
+                  py={0.5}
+                  rounded="md"
+                >
+                  {badge}
+                </Badge>
+              ))}
+            </HStack>
+          )}
+          <Text
+            fontSize="sm"
+            fontWeight="bold"
+            color={isSponsorSlot ? "gray.500" : "gray.800"}
+            lineClamp={2}
+            lineHeight="short"
+          >
+            {title}
+          </Text>
+          <Text fontSize="xs" color="gray.500" lineClamp={2}>
+            {description}
+          </Text>
+        </VStack>
+      </HStack>
+
+      {/* CTAボタン（スポンサー募集中の場合はグレー） */}
+      <Button
+        size="sm"
+        w="full"
+        mt={3}
+        bg={isSponsorSlot ? "gray.200" : "blue.50"}
+        color={isSponsorSlot ? "gray.500" : "blue.600"}
+        _hover={{ bg: isSponsorSlot ? "gray.200" : "blue.100" }}
+        fontWeight="bold"
+        h="36px"
+        rounded="lg"
+        disabled={isSponsorSlot}
+      >
+        {ctaText}
+        {!isSponsorSlot && (
+          <Icon ml={1}>
+            <LuExternalLink />
+          </Icon>
+        )}
+      </Button>
     </Box>
-  </Box>
-);
+  );
+
+  return (
+    <Box position="relative">
+      {isSponsorSlot ? (
+        cardContent
+      ) : (
+        <a
+          href={affiliateUrl}
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          style={{ display: "block", textDecoration: "none" }}
+        >
+          {cardContent}
+        </a>
+      )}
+
+      {/* トラッキングピクセル */}
+      {trackingPixel && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={trackingPixel}
+          alt=""
+          width={1}
+          height={1}
+          style={{ display: "none" }}
+        />
+      )}
+    </Box>
+  );
+};
 
 // アドバイスダイアログコンポーネント（コンテキスト広告付き）
 const AdviceDialog = ({
@@ -203,82 +376,15 @@ const AdviceDialog = ({
                   <Text fontSize="xs" fontWeight="bold" color="gray.400" mb={2}>
                     PR: おすすめサービス
                   </Text>
-
-                  {/* 広告カード */}
-                  <Box
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {
-                      // アフィリエイトリンクを開く
-                      window.open(
-                        content.affiliateUrl,
-                        "_blank",
-                        "noopener,noreferrer"
-                      );
-                    }}
-                    bg="white"
-                    border="2px solid"
-                    borderColor="blue.100"
-                    rounded="xl"
-                    p={4}
-                    cursor="pointer"
-                    transition="all 0.2s"
-                    _hover={{
-                      borderColor: "blue.300",
-                      shadow: "md",
-                      transform: "translateY(-1px)",
-                    }}
-                  >
-                    <HStack gap={3}>
-                      {/* サムネイル */}
-                      <Box
-                        boxSize="56px"
-                        bg="blue.50"
-                        rounded="lg"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        flexShrink={0}
-                      >
-                        <Text fontSize="xs" fontWeight="900" color="blue.500">
-                          AD
-                        </Text>
-                      </Box>
-
-                      {/* テキスト */}
-                      <VStack align="start" gap={1} flex={1}>
-                        <Text
-                          fontSize="sm"
-                          fontWeight="bold"
-                          color="gray.800"
-                          lineClamp={1}
-                        >
-                          {content.adTitle}
-                        </Text>
-                        <Text fontSize="xs" color="gray.500" lineClamp={2}>
-                          {content.adDescription}
-                        </Text>
-                      </VStack>
-                    </HStack>
-
-                    {/* CTA ボタン */}
-                    <Button
-                      size="sm"
-                      w="full"
-                      mt={3}
-                      bgGradient="to-r"
-                      gradientFrom="blue.500"
-                      gradientTo="teal.400"
-                      color="white"
-                      fontWeight="bold"
-                      _hover={{ opacity: 0.9 }}
-                    >
-                      {content.adCta}
-                      <Icon ml={1}>
-                        <LuExternalLink />
-                      </Icon>
-                    </Button>
-                  </Box>
+                  <AdCard
+                    title={content.adTitle}
+                    description={content.adDescription}
+                    ctaText={content.adCta}
+                    imageUrl={content.adImageUrl}
+                    affiliateUrl={content.affiliateUrl}
+                    badges={content.adBadges}
+                    trackingPixel={content.adTrackingPixel}
+                  />
                 </Box>
               </VStack>
             </Dialog.Body>
@@ -289,27 +395,21 @@ const AdviceDialog = ({
   );
 };
 
-// 広告コンポーネント（ネイティブ風）
+// 広告コンポーネント（ネイティブ風 - AdCard使用）
 const AdSlotNative = () => (
   <Box py={2}>
     <Text fontSize="xs" color="gray.400" textAlign="center" mb={1}>
       スポンサーリンク
     </Text>
-    <Box
-      minH="100px"
-      bg="gray.100"
-      rounded="xl"
-      overflow="hidden"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <GoogleAdsense
-        slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_NATIVE || "0000000001"}
-        format="fluid"
-        style={{ width: "100%", minHeight: "100px" }}
-      />
-    </Box>
+    <AdCard
+      title="akippa - 駐車場予約"
+      description="月極より安い！スマホで簡単予約できる駐車場シェアサービス"
+      ctaText="近くの駐車場を探す"
+      imageUrl="https://www28.a8.net/svt/bgt?aid=260111537808&wid=001&eno=01&mid=s00000017017001021000&mc=1"
+      affiliateUrl="https://px.a8.net/svt/ejp?a8mat=4AV3CH+DD29KI+3NAY+62U35"
+      badges={["駐車場代節約", "スマホ予約"]}
+      trackingPixel="https://www13.a8.net/0.gif?a8mat=4AV3CH+DD29KI+3NAY+62U35"
+    />
   </Box>
 );
 
@@ -355,7 +455,7 @@ export default function ResultDashboard({
 
   // UI State
   const [isOpen, setIsOpen] = useState(false);
-  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(true);
   const [selectedPreset, setSelectedPreset] = useState<PresetKey | null>(null);
   const [selectedAdvice, setSelectedAdvice] = useState<AdviceContent | null>(
     null
@@ -733,15 +833,15 @@ export default function ResultDashboard({
             </Card.Root>
           </Box>
 
-          {/* 🔥 広告スロット A（レクタングル）- 0.2秒遅れ */}
-          <Box
+          {/* 🔥 広告スロット A（レクタングル）- 一時的に非表示 */}
+          {/* <Box
             className="animate-fade-up"
             style={{ animationDelay: "0.2s" }}
             w="full"
             overflow="hidden"
           >
             <AdSlotLarge />
-          </Box>
+          </Box> */}
 
           {/* ===== 2. 基本設定 - 0.3秒遅れ ===== */}
           <Box className="animate-fade-up" style={{ animationDelay: "0.3s" }}>
@@ -876,6 +976,21 @@ export default function ResultDashboard({
             overflow="hidden"
           >
             <AdSlotNative />
+          </Box>
+
+          {/* 🚗 車買取バナー（カーネクスト）- 0.55秒遅れ */}
+          <Box className="animate-fade-up" style={{ animationDelay: "0.55s" }}>
+            <Text fontSize="xs" color="gray.400" textAlign="center" mb={1}>
+              スポンサーリンク
+            </Text>
+            <AdCard
+              title="カーネクスト - 車買取"
+              description="維持費が高いなら今の車を売りませんか？どんな車も0円以上買取保証"
+              ctaText="無料で査定する"
+              imageUrl="https://h.accesstrade.net/sp/rr?rk=0100l09w00on0k"
+              affiliateUrl="https://h.accesstrade.net/sp/cc?rk=0100l09w00on0k"
+              badges={["0円以上買取保証", "全国対応"]}
+            />
           </Box>
 
           {/* ===== 4. 詳細設定 - 0.6秒遅れ ===== */}
